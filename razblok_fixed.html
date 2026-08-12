@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Razblok — Разблокировка банковских карт 2026</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-primary: #0b0f19; --bg-secondary: #111827; --bg-card: #151b2b; --bg-card-hover: #1a2235;
+      --border-subtle: rgba(148,163,184,0.08); --border-medium: rgba(148,163,184,0.15); --border-accent: rgba(59,130,246,0.3);
+      --text-primary: #f8fafc; --text-secondary: #94a3b8; --text-muted: #64748b;
+      --accent-blue: #3b82f6; --accent-purple: #8b5cf6; --accent-green: #22c55e; --accent-amber: #f59e0b;
+      --accent-red: #ef4444; --accent-cyan: #06b6d4; --accent-pink: #ec4899;
+      --gradient-blue: linear-gradient(135deg, #3b82f6, #1d4ed8); --gradient-purple: linear-gradient(135deg, #8b5cf6, #6d28d9);
+      --gradient-green: linear-gradient(135deg, #22c55e, #16a34a); --gradient-amber: linear-gradient(135deg, #f59e0b, #d97706);
+      --gradient-red: linear-gradient(135deg, #ef4444, #dc2626); --gradient-cyan: linear-gradient(135deg, #06b6d4, #0891b2);
+      --gradient-pink: linear-gradient(135deg, #ec4899, #db2777);
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; background: var(--bg-primary); color: var(--text-primary); min-height: 100vh; overflow-x: hidden; line-height: 1.6; }
+    .hero { text-align: center; padding: 70px 20px 50px; position: relative; border-bottom: 1px solid var(--border-subtle); }
+    .hero::before { content: ''; position: absolute; top: -150px; left: 50%; transform: translateX(-50%); width: 800px; height: 800px; background: radial-gradient(circle, rgba(59,130,246,0.12) 0%, transparent 60%); pointer-events: none; }
+    .hero-badge { display: inline-flex; align-items: center; gap: 8px; background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.25); color: #4ade80; padding: 8px 20px; border-radius: 50px; font-size: 13px; font-weight: 500; margin-bottom: 28px; backdrop-filter: blur(10px); }
+    .hero-badge .dot { width: 8px; height: 8px; background: #4ade80; border-radius: 50%; animation: pulse 2s infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(1.3); } }
+    .hero h1 { font-size: 48px; font-weight: 900; background: linear-gradient(135deg, #fff 0%, #94a3b8 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 16px; line-height: 1.1; letter-spacing: -0.02em; }
+    .hero p { font-size: 18px; color: var(--text-secondary); max-width: 600px; margin: 0 auto 36px; line-height: 1.7; }
+    .stepper { display: flex; justify-content: center; gap: 12px; margin-bottom: 40px; flex-wrap: wrap; }
+    .step { display: flex; align-items: center; gap: 10px; padding: 12px 24px; border-radius: 14px; font-size: 14px; font-weight: 600; transition: all 0.3s ease; cursor: default; border: 2px solid transparent; }
+    .step.active { background: var(--gradient-blue); color: white; box-shadow: 0 4px 25px rgba(59,130,246,0.35); border-color: rgba(255,255,255,0.1); }
+    .step.completed { background: rgba(34,197,94,0.1); color: #4ade80; border: 2px solid rgba(34,197,94,0.25); }
+    .step.pending { background: rgba(148,163,184,0.05); color: var(--text-muted); border: 2px solid var(--border-subtle); }
+    .step-num { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 800; }
+    .step.active .step-num { background: rgba(255,255,255,0.2); }
+    .step.completed .step-num { background: rgba(34,197,94,0.2); }
+    .step.pending .step-num { background: rgba(148,163,184,0.1); }
+    .tips-bar { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-bottom: 10px; }
+    .tip-pill { display: flex; align-items: center; gap: 8px; padding: 10px 20px; background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 12px; font-size: 13px; color: var(--text-secondary); transition: all 0.2s; }
+    .tip-pill:hover { border-color: var(--border-medium); transform: translateY(-1px); }
+    .main-content { max-width: 1200px; margin: 0 auto; padding: 0 24px 60px; }
+    .section-title { font-size: 26px; font-weight: 800; margin-bottom: 28px; display: flex; align-items: center; gap: 14px; letter-spacing: -0.01em; }
+    .section-title .icon-wrap { width: 44px; height: 44px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
+    .icon-blue { background: var(--gradient-blue); } .icon-purple { background: var(--gradient-purple); } .icon-green { background: var(--gradient-green); }
+    .icon-amber { background: var(--gradient-amber); } .icon-red { background: var(--gradient-red); } .icon-cyan { background: var(--gradient-cyan); }
+    .bank-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 16px; margin-bottom: 50px; }
+    .bank-card { background: var(--bg-card); border: 2px solid var(--border-subtle); border-radius: 20px; padding: 24px 16px; text-align: center; cursor: pointer; transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1); position: relative; overflow: hidden; }
+    .bank-card::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: var(--gradient-blue); transform: scaleX(0); transition: transform 0.35s ease; border-radius: 0 0 20px 20px; }
+    .bank-card:hover { border-color: var(--border-accent); transform: translateY(-4px); box-shadow: 0 16px 40px rgba(59,130,246,0.12); background: var(--bg-card-hover); }
+    .bank-card:hover::after { transform: scaleX(1); }
+    .bank-card.selected { border-color: var(--accent-blue); background: rgba(59,130,246,0.08); box-shadow: 0 0 40px rgba(59,130,246,0.15), inset 0 0 0 1px rgba(59,130,246,0.2); }
+    .bank-card.selected::after { transform: scaleX(1); }
+    .bank-card .bank-logo { width: 56px; height: 56px; border-radius: 16px; margin: 0 auto 14px; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 800; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+    .bank-sber { background: linear-gradient(135deg, #21a038, #1a8a2e); color: white; }
+    .bank-tinkoff { background: linear-gradient(135deg, #ffdd2d, #f5c800); color: #1a1a1a; }
+    .bank-vtb { background: linear-gradient(135deg, #002882, #001a5c); color: white; }
+    .bank-alfa { background: linear-gradient(135deg, #ef3124, #d42a1f); color: white; }
+    .bank-gazprom { background: linear-gradient(135deg, #0079c2, #0062a0); color: white; }
+    .bank-raiff { background: linear-gradient(135deg, #ffed00, #e6d500); color: #1a1a1a; }
+    .bank-card .bank-name { font-size: 15px; font-weight: 700; color: var(--text-primary); }
+    .block-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 18px; margin-bottom: 50px; }
+    .block-card { background: var(--bg-card); border: 2px solid var(--border-subtle); border-radius: 24px; padding: 28px; cursor: pointer; transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1); position: relative; overflow: hidden; }
+    .block-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; opacity: 0; transition: opacity 0.3s; }
+    .block-card:hover { transform: translateY(-4px); box-shadow: 0 20px 50px rgba(0,0,0,0.4); background: var(--bg-card-hover); }
+    .block-card:hover::before { opacity: 1; }
+    .block-card.selected { box-shadow: 0 0 40px rgba(59,130,246,0.1), inset 0 0 0 1px rgba(59,130,246,0.15); }
+    .block-card.selected::before { opacity: 1; }
+    .block-card .block-icon { width: 52px; height: 52px; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 26px; margin-bottom: 18px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+    .block-card h3 { font-size: 18px; font-weight: 800; margin-bottom: 10px; color: var(--text-primary); letter-spacing: -0.01em; }
+    .block-card p { font-size: 14px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 14px; }
+    .block-card .block-tag { display: inline-block; padding: 5px 14px; border-radius: 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+    .tag-easy { background: rgba(34,197,94,0.12); color: #4ade80; border: 1px solid rgba(34,197,94,0.2); }
+    .tag-medium { background: rgba(245,158,11,0.12); color: #fbbf24; border: 1px solid rgba(245,158,11,0.2); }
+    .tag-hard { background: rgba(239,68,68,0.12); color: #f87171; border: 1px solid rgba(239,68,68,0.2); }
+    .bc-pin { border-color: rgba(59,130,246,0.15); } .bc-pin:hover { border-color: rgba(59,130,246,0.4); } .bc-pin::before { background: var(--gradient-blue); } .bc-pin.selected { border-color: rgba(59,130,246,0.5); }
+    .bc-expiry { border-color: rgba(139,92,246,0.15); } .bc-expiry:hover { border-color: rgba(139,92,246,0.4); } .bc-expiry::before { background: var(--gradient-purple); } .bc-expiry.selected { border-color: rgba(139,92,246,0.5); }
+    .bc-client { border-color: rgba(34,197,94,0.15); } .bc-client:hover { border-color: rgba(34,197,94,0.4); } .bc-client::before { background: var(--gradient-green); } .bc-client.selected { border-color: rgba(34,197,94,0.5); }
+    .bc-f115 { border-color: rgba(239,68,68,0.15); } .bc-f115:hover { border-color: rgba(239,68,68,0.4); } .bc-f115::before { background: var(--gradient-red); } .bc-f115.selected { border-color: rgba(239,68,68,0.5); }
+    .bc-f161 { border-color: rgba(245,158,11,0.15); } .bc-f161:hover { border-color: rgba(245,158,11,0.4); } .bc-f161::before { background: var(--gradient-amber); } .bc-f161.selected { border-color: rgba(245,158,11,0.5); }
+    .bc-fssp { border-color: rgba(236,72,153,0.15); } .bc-fssp:hover { border-color: rgba(236,72,153,0.4); } .bc-fssp::before { background: var(--gradient-pink); } .bc-fssp.selected { border-color: rgba(236,72,153,0.5); }
+    .bc-overdue { border-color: rgba(6,182,212,0.15); } .bc-overdue:hover { border-color: rgba(6,182,212,0.4); } .bc-overdue::before { background: var(--gradient-cyan); } .bc-overdue.selected { border-color: rgba(6,182,212,0.5); }
+    .detail-panel { background: var(--bg-secondary); border: 2px solid var(--border-medium); border-radius: 28px; padding: 40px; margin-top: 20px; animation: slideUp 0.5s cubic-bezier(0.4, 0, 0.2, 1); position: relative; }
+    .detail-panel::before { content: ''; position: absolute; top: 0; left: 40px; right: 40px; height: 4px; background: var(--gradient-blue); border-radius: 0 0 4px 4px; }
+    @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+    .detail-header { display: flex; align-items: flex-start; gap: 24px; margin-bottom: 32px; padding-bottom: 28px; border-bottom: 1px solid var(--border-subtle); }
+    .detail-header .big-icon { width: 72px; height: 72px; border-radius: 24px; display: flex; align-items: center; justify-content: center; font-size: 36px; flex-shrink: 0; box-shadow: 0 8px 30px rgba(0,0,0,0.3); }
+    .detail-header h2 { font-size: 28px; font-weight: 800; margin-bottom: 10px; letter-spacing: -0.02em; }
+    .detail-header .desc { color: var(--text-secondary); font-size: 15px; line-height: 1.7; }
+    .panel-section { margin-bottom: 32px; padding: 24px; border-radius: 20px; border: 1px solid; position: relative; }
+    .panel-section h4 { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 16px; display: flex; align-items: center; gap: 10px; }
+    .sec-reasons { background: rgba(239,68,68,0.04); border-color: rgba(239,68,68,0.15); } .sec-reasons h4 { color: #f87171; } .sec-reasons h4::before { content: '⚠️'; font-size: 16px; }
+    .sec-methods { background: rgba(59,130,246,0.04); border-color: rgba(59,130,246,0.15); } .sec-methods h4 { color: #60a5fa; } .sec-methods h4::before { content: '🔧'; font-size: 16px; }
+    .sec-docs { background: rgba(139,92,246,0.04); border-color: rgba(139,92,246,0.15); } .sec-docs h4 { color: #a78bfa; } .sec-docs h4::before { content: '📋'; font-size: 16px; }
+    .sec-bank { background: rgba(34,197,94,0.04); border-color: rgba(34,197,94,0.15); } .sec-bank h4 { color: #4ade80; } .sec-bank h4::before { content: '🏦'; font-size: 16px; }
+    .sec-checklist { background: rgba(245,158,11,0.04); border-color: rgba(245,158,11,0.15); } .sec-checklist h4 { color: #fbbf24; } .sec-checklist h4::before { content: '✅'; font-size: 16px; }
+    .sec-download { background: rgba(6,182,212,0.04); border-color: rgba(6,182,212,0.15); } .sec-download h4 { color: #22d3ee; } .sec-download h4::before { content: '⬇️'; font-size: 16px; }
+    .reasons-list { display: flex; flex-wrap: wrap; gap: 10px; }
+    .reason-tag { background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.2); color: #f87171; padding: 8px 16px; border-radius: 12px; font-size: 13px; font-weight: 500; }
+    .method-item { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 18px; padding: 22px; margin-bottom: 14px; display: grid; grid-template-columns: 1fr auto; gap: 18px; align-items: start; transition: all 0.25s; }
+    .method-item:hover { border-color: rgba(59,130,246,0.2); background: var(--bg-card-hover); transform: translateX(4px); }
+    .method-item .method-name { font-size: 17px; font-weight: 700; color: var(--text-primary); margin-bottom: 8px; }
+    .method-item .method-desc { font-size: 14px; color: var(--text-secondary); line-height: 1.6; }
+    .method-item .method-meta { display: flex; flex-direction: column; gap: 8px; align-items: flex-end; }
+    .meta-badge { display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: 10px; font-size: 12px; font-weight: 600; white-space: nowrap; }
+    .meta-time { background: rgba(59,130,246,0.12); color: #60a5fa; } .meta-docs { background: rgba(139,92,246,0.12); color: #a78bfa; }
+    .docs-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; }
+    .doc-item { display: flex; align-items: center; gap: 14px; padding: 14px 18px; background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 14px; font-size: 14px; color: #cbd5e1; transition: all 0.2s; }
+    .doc-item:hover { border-color: rgba(139,92,246,0.2); transform: translateX(3px); }
+    .doc-item .doc-icon { width: 36px; height: 36px; border-radius: 10px; background: rgba(139,92,246,0.12); display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+    .bank-specific-info { display: flex; align-items: flex-start; gap: 18px; padding: 20px; background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 18px; }
+    .bank-specific-info .bank-logo-sm { width: 50px; height: 50px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 800; flex-shrink: 0; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+    .bank-specific-info p { font-size: 14px; color: #cbd5e1; line-height: 1.7; }
+    .checklist-item { display: flex; align-items: center; gap: 14px; padding: 14px 0; border-bottom: 1px solid var(--border-subtle); cursor: pointer; transition: all 0.2s; }
+    .checklist-item:last-child { border-bottom: none; } .checklist-item:hover { padding-left: 6px; }
+    .checklist-item .checkbox { width: 24px; height: 24px; border: 2px solid var(--border-medium); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 14px; transition: all 0.2s; flex-shrink: 0; color: transparent; }
+    .checklist-item.checked .checkbox { background: var(--gradient-green); border-color: transparent; color: white; }
+    .checklist-item .check-text { font-size: 14px; color: #cbd5e1; transition: all 0.2s; }
+    .checklist-item.checked .check-text { color: var(--text-muted); text-decoration: line-through; }
+    .progress-bar { width: 100%; height: 8px; background: var(--bg-card); border-radius: 4px; margin-top: 18px; overflow: hidden; border: 1px solid var(--border-subtle); }
+    .progress-bar .progress-fill { height: 100%; background: var(--gradient-green); border-radius: 4px; transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+    .progress-text { text-align: center; margin-top: 10px; font-size: 13px; color: var(--text-muted); font-weight: 500; }
+    .download-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; }
+    .download-card { display: flex; align-items: center; gap: 16px; padding: 18px 20px; background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 16px; cursor: pointer; transition: all 0.25s; text-decoration: none; color: inherit; }
+    .download-card:hover { border-color: rgba(6,182,212,0.3); background: var(--bg-card-hover); transform: translateY(-2px); box-shadow: 0 8px 25px rgba(6,182,212,0.1); }
+    .download-card .dl-icon { width: 44px; height: 44px; border-radius: 12px; background: rgba(6,182,212,0.12); display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
+    .download-card .dl-info { flex: 1; } .download-card .dl-name { font-size: 14px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px; } .download-card .dl-desc { font-size: 12px; color: var(--text-muted); }
+    .download-card .dl-arrow { font-size: 18px; color: var(--text-muted); transition: all 0.2s; } .download-card:hover .dl-arrow { color: #22d3ee; transform: translateX(4px); }
+    .download-card.external { border-color: rgba(139,92,246,0.2); } .download-card.external:hover { border-color: rgba(139,92,246,0.4); box-shadow: 0 8px 25px rgba(139,92,246,0.1); }
+    .download-card.external .dl-icon { background: rgba(139,92,246,0.12); } .download-card.external:hover .dl-arrow { color: #a78bfa; }
+    .site-footer { text-align: center; padding: 50px 24px; color: var(--text-muted); font-size: 13px; border-top: 1px solid var(--border-subtle); margin-top: 50px; line-height: 1.8; }
+    .site-footer a { color: var(--accent-blue); text-decoration: none; font-weight: 600; } .site-footer a:hover { text-decoration: underline; }
+    @media (max-width: 768px) {
+      .hero h1 { font-size: 32px; } .hero p { font-size: 16px; } .block-grid { grid-template-columns: 1fr; } .bank-grid { grid-template-columns: repeat(2, 1fr); }
+      .method-item { grid-template-columns: 1fr; } .method-item .method-meta { align-items: flex-start; flex-direction: row; flex-wrap: wrap; }
+      .detail-header { flex-direction: column; } .detail-header h2 { font-size: 22px; } .docs-grid { grid-template-columns: 1fr; } .download-grid { grid-template-columns: 1fr; }
+      .detail-panel { padding: 24px; } .panel-section { padding: 18px; }
+    }
+    .hidden { display: none !important; }
+    ::-webkit-scrollbar { width: 8px; } ::-webkit-scrollbar-track { background: var(--bg-primary); } ::-webkit-scrollbar-thumb { background: var(--border-medium); border-radius: 4px; } ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+  </style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-badge"><span class="dot"></span>Актуально на 2026 год</div>
+  <h1>Разблокировка банковских карт</h1>
+  <p>Официальные методы разблокировки карт от ведущих банков России. Выберите свой банк и тип блокировки — получите пошаговую инструкцию с нужными документами.</p>
+  <div class="stepper">
+    <div class="step active" id="step1"><span class="step-num">1</span><span>Выберите банк</span></div>
+    <div class="step pending" id="step2"><span class="step-num">2</span><span>Тип блокировки</span></div>
+    <div class="step pending" id="step3"><span class="step-num">3</span><span>Инструкция</span></div>
+  </div>
+  <div class="tips-bar">
+    <div class="tip-pill">📞 Звоните только по номеру на карте</div>
+    <div class="tip-pill">📄 Сохраняйте все чеки и договоры</div>
+    <div class="tip-pill">⏱️ Не откладывайте — чем раньше, тем лучше</div>
+  </div>
+</div>
+
+<div class="main-content">
+  <div id="bankSection">
+    <div class="section-title"><div class="icon-wrap icon-blue">🏦</div>Выберите ваш банк</div>
+    <div class="bank-grid">
+      <div class="bank-card" data-bank="Сбербанк" onclick="selectBank(this)"><div class="bank-logo bank-sber">СБЕР</div><div class="bank-name">Сбербанк</div></div>
+      <div class="bank-card" data-bank="Тинькофф" onclick="selectBank(this)"><div class="bank-logo bank-tinkoff">Т</div><div class="bank-name">Тинькофф</div></div>
+      <div class="bank-card" data-bank="ВТБ" onclick="selectBank(this)"><div class="bank-logo bank-vtb">ВТБ</div><div class="bank-name">ВТБ</div></div>
+      <div class="bank-card" data-bank="Альфа-Банк" onclick="selectBank(this)"><div class="bank-logo bank-alfa">А</div><div class="bank-name">Альфа-Банк</div></div>
+      <div class="bank-card" data-bank="Газпромбанк" onclick="selectBank(this)"><div class="bank-logo bank-gazprom">ГПБ</div><div class="bank-name">Газпромбанк</div></div>
+      <div class="bank-card" data-bank="Райффайзен" onclick="selectBank(this)"><div class="bank-logo bank-raiff">РБ</div><div class="bank-name">Райффайзен</div></div>
+    </div>
+  </div>
+
+  <div id="blockSection" class="hidden">
+    <div class="section-title"><div class="icon-wrap icon-purple">🔍</div>Что случилось с картой?</div>
+    <div class="block-grid">
+      <div class="block-card bc-pin" data-type="pin_block" onclick="selectBlockType(this)"><div class="block-icon" style="background:rgba(59,130,246,0.15)">🔒</div><h3>Неверный ПИН-код</h3><p>После 3 ошибочных попыток карта заблокирована на 24 часа</p><span class="block-tag tag-easy">Просто</span></div>
+      <div class="block-card bc-expiry" data-type="expiry" onclick="selectBlockType(this)"><div class="block-icon" style="background:rgba(139,92,246,0.15)">📅</div><h3>Истёк срок действия</h3><p>Карта перестала работать после даты на пластике</p><span class="block-tag tag-easy">Просто</span></div>
+      <div class="block-card bc-client" data-type="client_block" onclick="selectBlockType(this)"><div class="block-icon" style="background:rgba(34,197,94,0.15)">👤</div><h3>Заблокировал сам</h3><p>Утеря, кража или временная блокировка через приложение</p><span class="block-tag tag-easy">Просто</span></div>
+      <div class="block-card bc-f115" data-type="f115" onclick="selectBlockType(this)"><div class="block-icon" style="background:rgba(239,68,68,0.15)">🛡️</div><h3>Блокировка по 115-ФЗ</h3><p>Банк заморозил карту из-за подозрительной операции</p><span class="block-tag tag-hard">Сложно</span></div>
+      <div class="block-card bc-f161" data-type="f161" onclick="selectBlockType(this)"><div class="block-icon" style="background:rgba(245,158,11,0.15)">❄️</div><h3>Период охлаждения (161-ФЗ)</h3><p>Перевод приостановлен на 48 часов — получатель в чёрном списке</p><span class="block-tag tag-medium">Средне</span></div>
+      <div class="block-card bc-fssp" data-type="fssp" onclick="selectBlockType(this)"><div class="block-icon" style="background:rgba(236,72,153,0.15)">⚖️</div><h3>Арест приставами</h3><p>Счёт арестован по решению суда или постановлению ФССП</p><span class="block-tag tag-hard">Сложно</span></div>
+      <div class="block-card bc-overdue" data-type="overdue" onclick="selectBlockType(this)"><div class="block-icon" style="background:rgba(6,182,212,0.15)">💳</div><h3>Просроченные обязательства</h3><p>Блокировка из-за долга по кредиту или кредитной карте</p><span class="block-tag tag-medium">Средне</span></div>
+    </div>
+  </div>
+
+  <div id="detailPanel" class="hidden"></div>
+</div>
+
+<div class="site-footer">
+  Информация актуальна на август 2026 года. Все методы основаны на официальных требованиях ЦБ РФ и федеральных законах.<br>
+  При возникновении споров обращайтесь в <a href="https://cbr.ru" target="_blank">Центральный банк РФ</a> через интернет-приёмную.<br><br>
+  <div style="margin-top:16px;padding-top:16px;border-top:1px solid rgba(148,163,184,0.08)">
+    <span style="color:#94a3b8">Создано</span> <strong style="color:#f8fafc">Нажаев Ахмад</strong>
+    <span style="color:#64748b;margin:0 8px">|</span>
+    <a href="https://t.me/nazhayev" target="_blank" style="color:#3b82f6;text-decoration:none">@nazhayev</a>
+  </div>
+</div>
+
+<script>
+
+// Using template literals (backticks) for all multi-line content to avoid escape issues
+const blockData = {
+  pin_block: {
+    title: "Блокировка по неверному ПИН-коду",
+    icon: "🔒",
+    gradient: "linear-gradient(135deg, #3b82f6, #1d4ed8)",
+    description: "После 3 ошибочных попыток ввода ПИН-кода карта блокируется автоматически на 24 часа. Это защита от подбора кода мошенниками.",
+    reasons: ["3 неверных попытки ввода ПИН-кода подряд"],
+    documents: ["Паспорт", "Кодовое слово (при звонке в банк)"],
+    methods: [
+      {name: "Ожидание 24 часа", desc: "Карта разблокируется автоматически без каких-либо действий", time: "24 часа", docs: "Не требуется"},
+      {name: "Звонок в банк", desc: "Позвоните на горячую линию, назовите кодовое слово и паспортные данные", time: "Немедленно", docs: "Паспорт, кодовое слово"},
+      {name: "Мобильное приложение", desc: "Смените ПИН-код через приложение — блокировка снимется автоматически", time: "Немедленно", docs: "Биометрия / пароль от приложения"}
+    ],
+    banks: {
+      "Сбербанк": "Разблокировка через СберБанк Онлайн или звонок на 900. Кодовое слово — при регистрации в банке.",
+      "Тинькофф": "В приложении Тинькофф: Карты → выберите карту → Сменить ПИН. Или звонок на 8-800-555-7777.",
+      "ВТБ": "В приложении ВТБ Онлайн или звонок на горячую линию 8-800-100-24-24.",
+      "Альфа-Банк": "В Альфа-Клике или через звонок оператору 8-800-2000-000.",
+      "Газпромбанк": "В мобильном банке или отделении с паспортом. Горячая линия: 8-800-100-07-01.",
+      "Райффайзен": "В приложении или звонок на 8-800-770-70-66."
+    },
+    downloads: [
+      {name: "Инструкция по разблокировке", desc: "Пошаговое руководство (PDF)", type: "pdf", content: `ИНСТРУКЦИЯ ПО РАЗБЛОКИРОВКЕ КАРТЫ ПО НЕВЕРНОМУ ПИН-КОДУ
+
+1. Дождитесь 24 часов — карта разблокируется автоматически
+2. Либо позвоните в банк по номеру на обратной стороне карты
+3. Назовите кодовое слово и паспортные данные
+4. Оператор снимет блокировку немедленно
+5. Альтернатива: смените ПИН через мобильное приложение
+
+Документы: паспорт, кодовое слово.
+Срок: от немедленно до 24 часов.`},
+      {name: "Образец заявления", desc: "В банк о разблокировке (DOC)", type: "doc", content: `ЗАЯВЛЕНИЕ
+
+В [название банка]
+От: [ФИО]
+Паспорт: [серия/номер]
+Номер карты: **** **** **** [последние 4 цифры]
+
+Прошу разблокировать карту, заблокированную по причине неверного ввода ПИН-кода.
+
+Дата: ___________ Подпись: ___________`}
+    ]
+  },
+  expiry: {
+    title: "Истечение срока действия карты",
+    icon: "📅",
+    gradient: "linear-gradient(135deg, #8b5cf6, #6d28d9)",
+    description: "Карта перестает работать после даты, указанной на пластике. Карты 'Мир' с декабря 2025 продолжают работать независимо от срока. Счет остается активным.",
+    reasons: ["Истек срок действия карты"],
+    documents: ["Паспорт"],
+    methods: [
+      {name: "Перевыпуск карты", desc: "Закажите новую карту через приложение или в отделении банка", time: "1-14 дней", docs: "Паспорт"},
+      {name: "Виртуальная карта", desc: "Выпустите виртуальную карту к тому же счету — работает моментально", time: "Моментально", docs: "Не требуется"},
+      {name: "Снятие в кассе", desc: "Получите наличные по паспорту в любом отделении банка", time: "Немедленно", docs: "Паспорт"}
+    ],
+    banks: {
+      "Сбербанк": "Перевыпуск через СберБанк Онлайн. Доставка курьером или в отделении. Срок: 3-7 дней.",
+      "Тинькофф": "Бесплатный перевыпуск с доставкой курьером. Виртуальная карта — моментально в приложении.",
+      "ВТБ": "Перевыпуск в приложении ВТБ Онлайн или отделении. Срок: 3-7 дней.",
+      "Альфа-Банк": "Моментальный выпуск виртуальной карты. Пластик — 3-5 дней с доставкой.",
+      "Газпромбанк": "Перевыпуск в приложении или отделении. Срок: 5-10 дней.",
+      "Райффайзен": "Перевыпуск через приложение или отделение. Срок: 3-7 дней."
+    },
+    downloads: [
+      {name: "Инструкция по перевыпуску", desc: "Пошаговое руководство (PDF)", type: "pdf", content: `ИНСТРУКЦИЯ ПО ПЕРЕВЫПУСКУ КАРТЫ
+
+1. Откройте мобильное приложение банка
+2. Перейдите в раздел 'Карты'
+3. Выберите истекшую карту → 'Перевыпустить'
+4. Выберите способ получения: курьер / отделение / почта
+5. Виртуальная карта доступна моментально
+
+Документы: паспорт (для получения в отделении).
+Срок: виртуальная — моментально, пластик — 3-14 дней.`}
+    ]
+  },
+  client_block: {
+    title: "Блокировка по инициативе клиента",
+    icon: "👤",
+    gradient: "linear-gradient(135deg, #22c55e, #16a34a)",
+    description: "Вы сами заблокировали карту при утере, краже или подозрении на мошенничество. Также возможна временная блокировка через приложение.",
+    reasons: ["Утеря карты", "Кража", "Подозрение на мошенничество", "Временная блокировка через приложение"],
+    documents: ["Паспорт"],
+    methods: [
+      {name: "Разблокировка через приложение", desc: "Если блокировали сами — снимите ограничение в мобильном приложении", time: "Немедленно", docs: "Не требуется"},
+      {name: "Звонок в банк", desc: "Если блокировали по утере — позвоните для подтверждения личности", time: "Немедленно", docs: "Паспорт, кодовое слово"},
+      {name: "Перевыпуск карты", desc: "Если карта утеряна — закажите новую через приложение или отделение", time: "1-14 дней", docs: "Паспорт"}
+    ],
+    banks: {
+      "Сбербанк": "Разблокировка в СберБанк Онлайн. При утере — перевыпуск через приложение или отделение.",
+      "Тинькофф": "В приложении: Карты → выберите карту → Разблокировать. При утере — заказ новой.",
+      "ВТБ": "В приложении ВТБ Онлайн или звонок на 8-800-100-24-24.",
+      "Альфа-Банк": "В Альфа-Клике или через оператора 8-800-2000-000.",
+      "Газпромбанк": "В мобильном банке или отделении. Горячая линия: 8-800-100-07-01.",
+      "Райффайзен": "В приложении или через звонок на 8-800-770-70-66."
+    },
+    downloads: [
+      {name: "Инструкция по разблокировке", desc: "Пошаговое руководство (PDF)", type: "pdf", content: `ИНСТРУКЦИЯ ПО РАЗБЛОКИРОВКЕ КАРТЫ
+
+1. Откройте мобильное приложение банка
+2. Перейдите в раздел 'Карты'
+3. Найдите заблокированную карту
+4. Нажмите 'Разблокировать'
+5. Подтвердите действие
+
+Если карта утеряна — закажите перевыпуск.
+Документы: паспорт (для отделения).
+Срок: разблокировка — немедленно, перевыпуск — 1-14 дней.`},
+      {name: "Образец заявления на перевыпуск", desc: "При утере карты (DOC)", type: "doc", content: `ЗАЯВЛЕНИЕ НА ПЕРЕВЫПУСК КАРТЫ
+
+В [название банка]
+От: [ФИО]
+Паспорт: [серия/номер]
+
+Прошу перевыпустить карту в связи с утерей.
+Прошу заблокировать старую карту **** **** **** [последние 4 цифры].
+
+Дата: ___________ Подпись: ___________`}
+    ]
+  },
+  f115: {
+    title: "Блокировка по 115-ФЗ (Финмониторинг)",
+    icon: "🛡️",
+    gradient: "linear-gradient(135deg, #ef4444, #dc2626)",
+    description: "Банк приостанавливает операции при подозрении в отмывании денег по закону No 115-ФЗ. Срок: до 5 рабочих дней, по решению Росфинмониторинга — до 30 дней.",
+    reasons: ["Операции с наличными от 1 млн руб.", "Переводы более 100 000 руб.", "Отсутствие повседневных расходов", "Частые переводы в офшорные зоны", "Крупный перевод на незнакомый кошелек", "Необычная операция"],
+    documents: ["Справка о доходах (2-НДФЛ, налоговая декларация)", "Трудовой договор", "Договор купли-продажи", "Акты выполненных работ / счета-фактуры", "Договор оказания услуг", "Платежные поручения", "Банковские выписки", "Скриншоты переписки с контрагентом", "Чеки, подтверждающие операцию"],
+    methods: [
+      {name: "Подача документов в банк", desc: "Отправьте через приложение, email или отнесите в отделение. Банк обязан дать ответ в течение 7 рабочих дней.", time: "До 7 раб. дней", docs: "Пакет документов по сделке"},
+      {name: "Жалоба в ЦБ РФ", desc: "Если банк отказал без объяснений — подайте через интернет-приемную ЦБ. Решение обязательно для банка.", time: "20 рабочих дней", docs: "Копии переписки, документы"},
+      {name: "МВК (Межведомственная комиссия)", desc: "Рассмотрение спора по 115-ФЗ. Комиссия ЦБ рассматривает жалобы на действия банков.", time: "20 рабочих дней", docs: "Заявление, документы"}
+    ],
+    banks: {
+      "Сбербанк": "Документы через СберБанк Онлайн (чат с поддержкой) или отделение. Решение до 7 раб. дней. Жалоба в ЦБ — через интернет-приемную cbr.ru.",
+      "Тинькофф": "Загрузка документов через приложение → раздел 'Документы' или чат поддержки. Решение до 7 раб. дней.",
+      "ВТБ": "Подать документы в приложении ВТБ Онлайн или в отделении с оригиналами.",
+      "Альфа-Банк": "Чат в приложении или личный визит в отделение с оригиналами документов.",
+      "Газпромбанк": "Отделение с оригиналами документов или через интернет-банк. Срок до 30 дней.",
+      "Райффайзен": "Личный кабинет, email или отделение. Срок рассмотрения — до 30 дней."
+    },
+    downloads: [
+      {name: "Полное руководство по 115-ФЗ", desc: "Все способы разблокировки (PDF)", type: "pdf", content: `РУКОВОДСТВО ПО РАЗБЛОКИРОВКЕ ПО 115-ФЗ
+
+ШАГ 1. Соберите документы:
+- Справка о доходах (2-НДФЛ)
+- Трудовой договор
+- Договор купли-продажи / оказания услуг
+- Акты выполненных работ
+- Платежные поручения
+- Выписки из других банков
+
+ШАГ 2. Подайте документы:
+- Через мобильное приложение
+- Через email банка
+- Лично в отделении с оригиналами
+
+ШАГ 3. Дождитесь ответа (до 7 раб. дней)
+
+ШАГ 4. Если отказали без оснований:
+- Подайте жалобу в ЦБ РФ через cbr.ru
+- Срок рассмотрения: 20 рабочих дней
+- Решение ЦБ обязательно для банка
+
+ШАГ 5. Альтернатива — МВК ЦБ:
+- Межведомственная комиссия
+- Срок: 20 рабочих дней
+
+Важно: с 1 июня 2025 Росфинмониторинг может
+инициировать приостановку на срок до 10 дней.`},
+      {name: "Образец жалобы в ЦБ РФ", desc: "По 115-ФЗ (DOC)", type: "doc", content: `ЖАЛОБА В ЦЕНТРАЛЬНЫЙ БАНК РОССИЙСКОЙ ФЕДЕРАЦИИ
+
+В Центральный банк РФ
+
+От: [ФИО]
+Адрес: [адрес]
+Телефон: [телефон]
+Email: [email]
+
+ЖАЛОБА
+
+На: [название банка]
+
+[Дата] банк приостановил операции по моей карте
+**** **** **** [последние 4 цифры] на основании 115-ФЗ.
+
+Я предоставил все необходимые документы:
+[перечислить документы]
+
+Банк отказал в разблокировке без обоснования /
+превысил установленный срок рассмотрения.
+
+Прошу:
+1. Проверить законность действий банка
+2. Обязать банк разблокировать карту
+3. Привлечь банк к ответственности
+
+Приложения:
+1. Копии документов
+2. Переписка с банком
+3. [другие документы]
+
+Дата: ___________ Подпись: ___________`},
+      {name: "Список документов по 115-ФЗ", desc: "Чек-лист для сбора (PDF)", type: "pdf", content: `ЧЕК-ЛИСТ ДОКУМЕНТОВ ПО 115-ФЗ
+
+Для подтверждения легальности операций:
+
+[ ] Справка о доходах (2-НДФЛ)
+[ ] Трудовой договор
+[ ] Договор купли-продажи (если операция связана с покупкой)
+[ ] Договор оказания услуг
+[ ] Акты выполненных работ / счета-фактуры
+[ ] Платежные поручения
+[ ] Банковские выписки из других банков
+[ ] Справка о регистрации компании (для ИП/ЮЛ)
+[ ] Скриншоты переписки с контрагентом
+[ ] Чеки, подтверждающие операцию
+
+Советы:
+- Собирайте документы по каждой операции отдельно
+- Сохраняйте оригиналы
+- Делайте сканы в хорошем качестве
+- Подписывайте каждый документ`},
+      {name: "Заявление в МВК ЦБ", desc: "Межведомственная комиссия (DOC)", type: "doc", content: `ЗАЯВЛЕНИЕ В МЕЖВЕДОМСТВЕННУЮ КОМИССИЮ ЦБ РФ
+
+В Межведомственную комиссию ЦБ РФ
+
+От: [ФИО]
+
+ЗАЯВЛЕНИЕ
+
+[Дата] [название банка] приостановил операции по
+моему счету на основании ст. 7 115-ФЗ.
+
+Я считаю действия банка незаконными, так как:
+[описать причины]
+
+Прошу рассмотреть спор и принять решение о
+необходимости разблокировки счета.
+
+Приложения:
+1. Копии документов
+2. Ответ банка
+3. [прочие документы]
+
+Дата: ___________ Подпись: ___________`},
+      {name: "Получить 2-НДФЛ", desc: "Онлайн через Госуслуги (внешняя ссылка)", type: "external", url: "https://www.gosuslugi.ru/help/faq/nalogi/2"},
+      {name: "Проверить задолженность", desc: "На сайте ФССП (внешняя ссылка)", type: "external", url: "https://fssprus.ru/iss/ip"}
+    ]
+  },
+  f161: {
+    title: "Блокировка по 161-ФЗ (Период охлаждения)",
+    icon: "❄️",
+    gradient: "linear-gradient(135deg, #f59e0b, #d97706)",
+    description: "Банк приостанавливает перевод на 48 часов, если получатель находится в 'черном списке' ЦБ. Это защита от мошенничества с июля 2024 года.",
+    reasons: ["Получатель перевода находится в базе мошеннических операций ЦБ"],
+    documents: ["Подтверждение личности", "Объяснение цели перевода"],
+    methods: [
+      {name: "Подтвердить операцию", desc: "Если уверены в получателе — подтвердите в приложении. Деньги уйдут через 48 часов.", time: "48 часов", docs: "Не требуется"},
+      {name: "Отказаться от перевода", desc: "Если сомневаетесь — отмените операцию, средства вернутся на счет немедленно.", time: "Немедленно", docs: "Не требуется"},
+      {name: "Исключение из базы ЦБ", desc: "Если ваши данные попали в базу ошибочно — заявление в Банк России через интернет-приемную.", time: "15 рабочих дней", docs: "Заявление через cbr.ru"}
+    ],
+    banks: {
+      "Сбербанк": "Уведомление в приложении с кнопками 'Подтвердить' и 'Отменить'. После подтверждения — перевод через 48 часов.",
+      "Тинькофф": "Push-уведомление с выбором действия. Отмена — моментально, подтверждение — через 48 часов.",
+      "ВТБ": "Сообщение в приложении, подтверждение через чат или по звонку.",
+      "Альфа-Банк": "Уведомление в Альфа-Клике с возможностью подтвердить или отменить.",
+      "Газпромбанк": "SMS + уведомление в мобильном банке. Подтверждение через приложение.",
+      "Райффайзен": "Уведомление в приложении с возможностью отмены или подтверждения."
+    },
+    downloads: [
+      {name: "Инструкция по 161-ФЗ", desc: "Период охлаждения (PDF)", type: "pdf", content: `ИНСТРУКЦИЯ ПО 161-ФЗ (ПЕРИОД ОХЛАЖДЕНИЯ)
+
+1. Проверьте уведомление в мобильном приложении
+2. Если УВЕРЕНЫ в получателе:
+   - Нажмите 'Подтвердить'
+   - Деньги уйдут через 48 часов
+3. Если СОМНЕВАЕТЕСЬ:
+   - Нажмите 'Отменить'
+   - Средства вернутся на счет немедленно
+4. Если ваши данные попали в базу ошибочно:
+   - Подайте заявление в ЦБ РФ через cbr.ru
+   - Срок рассмотрения: 15 рабочих дней
+
+Важно: период охлаждения — 48 часов.
+Это защита от мошенничества, действует с июля 2024.`}
+    ]
+  },
+  fssp: {
+    title: "Арест счета судебными приставами",
+    icon: "⚖️",
+    gradient: "linear-gradient(135deg, #ec4899, #db2777)",
+    description: "Принудительная мера по решению суда или постановлению ФССП. Причина — задолженность по кредитам, налогам, штрафам, алиментам, ЖКУ. Арест накладывается в пределах суммы долга.",
+    reasons: ["Задолженность по кредитам", "Налоговые долги", "Штрафы ГИБДД", "Алименты", "Долги по ЖКУ"],
+    documents: ["Квитанция об оплате долга", "Справка о закрытии исполнительного производства", "Справка из Социального фонда (для защищенных доходов)", "Выписка о поступлениях (для сохранения прожиточного минимума)", "Заявление приставу о сохранении прожиточного минимума"],
+    methods: [
+      {name: "Погашение долга", desc: "Оплатите задолженность, получите постановление об окончании производства от пристава.", time: "3 дня после постановления", docs: "Квитанция об оплате"},
+      {name: "Оспорить арест", desc: "Если арест ошибочный — заявление приставу с доказательствами. Если не реагирует — жалоба через Госуслуги.", time: "До 10 дней", docs: "Квитанции, справки, выписки"},
+      {name: "Сохранить прожиточный минимум", desc: "Подайте заявление приставу или в банк. Алименты, пособия, компенсации защищены от взыскания.", time: "До 10 раб. дней", docs: "Справка из СФР, выписка о поступлениях"},
+      {name: "Банкротство", desc: "При неподъемной задолженности — процедура банкротства через арбитражного управляющего.", time: "6-12 месяцев", docs: "Полный пакет для управляющего"}
+    ],
+    banks: {
+      "Сбербанк": "Арест снимается автоматически после получения постановления от ФССП. Банк уведомляет в течение 3 дней.",
+      "Тинькофф": "Автоматическое снятие после постановления ФССП. Заявление на прожиточный минимум — через приложение.",
+      "ВТБ": "Снятие ареста после постановления ФССП. Заявление на прожиточный минимум — в отделении.",
+      "Альфа-Банк": "Автоматическое снятие после документов от ФССП.",
+      "Газпромбанк": "Снятие ареста по постановлению ФССП. Заявления — в отделении.",
+      "Райффайзен": "Автоматическое снятие после получения документов от ФССП."
+    },
+    downloads: [
+      {name: "Руководство по аресту ФССП", desc: "Все способы снятия (PDF)", type: "pdf", content: `РУКОВОДСТВО ПО СНЯТИЮ АРЕСТА ФССП
+
+ШАГ 1. Узнайте причину ареста:
+- Проверьте задолженность на сайте fssprus.ru
+- Уточните номер исполнительного производства
+
+ШАГ 2. Погасите долг:
+- Оплатите через Госуслуги, банк или терминал
+- Сохраните квитанцию
+
+ШАГ 3. Получите постановление:
+- Об окончании исполнительного производства
+- От пристава или через Госуслуги
+
+ШАГ 4. Сохраните прожиточный минимум:
+- Подайте заявление приставу
+- Прикрепите справку из СФР
+- Укажите защищенные доходы (пособия, алименты)
+
+ШАГ 5. Если арест ошибочный:
+- Заявление приставу с доказательствами
+- Жалоба через Госуслуги
+- Обращение в суд
+
+Важно: арест снимается автоматически после
+постановления ФССП. Банк уведомит в течение 3 дней.`},
+      {name: "Заявление на прожиточный минимум", desc: "В ФССП (DOC)", type: "doc", content: `ЗАЯВЛЕНИЕ О СОХРАНЕНИИ ПРОЖИТОЧНОГО МИНИМУМА
+
+В ФССП [регион]
+
+От: [ФИО]
+Адрес: [адрес]
+
+ЗАЯВЛЕНИЕ
+
+Прошу сохранить на моем счету в [название банка]
+сумму в размере прожиточного минимума, установленного
+в [регион] на [год].
+
+На моем счету поступают следующие защищенные доходы:
+- [перечислить: пособия, алименты, компенсации и т.д.]
+
+Приложения:
+1. Справка из СФР о назначении пособий
+2. Выписка о поступлениях на счет
+3. Копия паспорта
+
+Дата: ___________ Подпись: ___________`},
+      {name: "Жалоба на незаконный арест", desc: "В ФССП (DOC)", type: "doc", content: `ЖАЛОБА НА НЕЗАКОННЫЙ АРЕСТ СЧЕТА
+
+В ФССП [регион]
+
+От: [ФИО]
+
+ЖАЛОБА
+
+[Дата] на мой счет в [название банка] был наложен арест
+в рамках исполнительного производства No [номер].
+
+Я считаю арест незаконным, так как:
+[указать причины: ошибочный долг, арест превышает сумму долга,
+защищенные доходы и т.д.]
+
+Прошу:
+1. Проверить законность ареста
+2. Снять арест со счета
+3. [другие требования]
+
+Приложения:
+1. Копии документов
+2. [прочие документы]
+
+Дата: ___________ Подпись: ___________`},
+      {name: "Проверить задолженность ФССП", desc: "Официальный сайт ФССП (внешняя ссылка)", type: "external", url: "https://fssprus.ru/iss/ip"},
+      {name: "Получить справку из СФР", desc: "Онлайн через Госуслуги (внешняя ссылка)", type: "external", url: "https://www.gosuslugi.ru/"}
+    ]
+  },
+  overdue: {
+    title: "Блокировка из-за просроченных обязательств",
+    icon: "💳",
+    gradient: "linear-gradient(135deg, #06b6d4, #0891b2)",
+    description: "Карта заблокирована из-за просрочки по кредиту, кредитной карте или другим обязательствам перед банком. Ограничения без погашения долгов не снимаются.",
+    reasons: ["Просрочка по кредиту", "Просрочка по кредитной карте", "Невыполнение условий договора"],
+    documents: ["Паспорт", "Квитанция об оплате задолженности"],
+    methods: [
+      {name: "Погашение задолженности", desc: "Погасите просрочку полностью через приложение, терминал или отделение.", time: "1-3 раб. дня после оплаты", docs: "Квитанция об оплате"},
+      {name: "Реструктуризация", desc: "Договоритесь с банком о реструктуризации долга — снижение платежа, отсрочка.", time: "До 30 дней на рассмотрение", docs: "Справка о доходах, заявление"},
+      {name: "Обращение в банк", desc: "Свяжитесь с банком для уточнения точной суммы задолженности и условий разблокировки.", time: "Немедленно", docs: "Паспорт"}
+    ],
+    banks: {
+      "Сбербанк": "Погашение через СберБанк Онлайн. Разблокировка в течение 1-3 раб. дней после погашения.",
+      "Тинькофф": "Оплата через приложение. Разблокировка автоматическая после полного погашения.",
+      "ВТБ": "Погашение в приложении или отделении. Разблокировка до 3 раб. дней.",
+      "Альфа-Банк": "Оплата через Альфа-Клик. Разблокировка после подтверждения платежа.",
+      "Газпромбанк": "Погашение в мобильном банке или отделении.",
+      "Райффайзен": "Оплата через приложение. Разблокировка автоматическая."
+    },
+    downloads: [
+      {name: "Инструкция по погашению долга", desc: "Разблокировка карты (PDF)", type: "pdf", content: `ИНСТРУКЦИЯ ПО РАЗБЛОКИРОВКЕ ПРИ ПРОСРОЧКЕ
+
+ШАГ 1. Узнайте точную сумму задолженности:
+- В мобильном приложении банка
+- По звонку на горячую линию
+- В отделении банка
+
+ШАГ 2. Погасите задолженность:
+- Через мобильное приложение
+- Через терминал
+- В отделении банка
+- Через СБП из другого банка
+
+ШАГ 3. Сохраните квитанцию об оплате
+
+ШАГ 4. Дождитесь разблокировки:
+- Обычно 1-3 рабочих дня
+- Проверяйте статус в приложении
+
+ШАГ 5. Альтернатива — реструктуризация:
+- Обратитесь в банк с заявлением
+- Предоставьте справку о доходах
+- Срок рассмотрения: до 30 дней
+
+Важно: карта не разблокируется без полного
+погашения задолженности или реструктуризации.`},
+      {name: "Заявление на реструктуризацию", desc: "В банк (DOC)", type: "doc", content: `ЗАЯВЛЕНИЕ НА РЕСТРУКТУРИЗАЦИЮ ДОЛГА
+
+В [название банка]
+
+От: [ФИО]
+Паспорт: [серия/номер]
+
+ЗАЯВЛЕНИЕ
+
+Прошу реструктуризировать задолженность по кредиту/карте
+No [номер договора] в связи с [указать причину:
+снижение дохода, потеря работы, болезнь и т.д.].
+
+Прошу:
+1. Снизить ежемесячный платеж до [сумма] руб.
+2. Увеличить срок кредита до [срок] месяцев
+3. [другие требования]
+
+Приложения:
+1. Справка о доходах (2-НДФЛ)
+2. Копия трудовой книжки
+3. [другие документы]
+
+Дата: ___________ Подпись: ___________`},
+      {name: "Получить 2-НДФЛ", desc: "Для реструктуризации через Госуслуги (внешняя ссылка)", type: "external", url: "https://www.gosuslugi.ru/help/faq/nalogi/2"}
+    ]
+  }
+};
+
+const bankLogos = {
+  "Сбербанк": { cls: "bank-sber", text: "СБЕР" },
+  "Тинькофф": { cls: "bank-tinkoff", text: "Т" },
+  "ВТБ": { cls: "bank-vtb", text: "ВТБ" },
+  "Альфа-Банк": { cls: "bank-alfa", text: "А" },
+  "Газпромбанк": { cls: "bank-gazprom", text: "ГПБ" },
+  "Райффайзен": { cls: "bank-raiff", text: "РБ" }
+};
+
+let selectedBank = null;
+let selectedBlock = null;
+
+function selectBank(el) {
+  document.querySelectorAll('.bank-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedBank = el.dataset.bank;
+  document.getElementById('step1').className = 'step completed';
+  document.getElementById('step2').className = 'step active';
+  document.getElementById('step3').className = 'step pending';
+  document.getElementById('blockSection').classList.remove('hidden');
+  document.getElementById('detailPanel').classList.add('hidden');
+  setTimeout(() => {
+    document.getElementById('blockSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 100);
+}
+
+function selectBlockType(el) {
+  document.querySelectorAll('.block-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedBlock = el.dataset.type;
+  document.getElementById('step1').className = 'step completed';
+  document.getElementById('step2').className = 'step completed';
+  document.getElementById('step3').className = 'step active';
+  renderDetail();
+}
+
+function downloadFile(name, content, type) {
+  if (type === 'external') {
+    window.open(content, '_blank');
+    return;
+  }
+  let mimeType, extension, blobContent;
+  if (type === 'pdf') {
+    mimeType = 'application/pdf';
+    extension = 'pdf';
+    const lines = content.split('\n');
+    let pdfText = '';
+    let y = 750;
+    lines.forEach(line => {
+      const safeLine = line.replace(/\\/g, '\\\\').replace(/\(/g, '\\(').replace(/\)/g, '\\)');
+      pdfText += 'BT /F1 12 Tf 50 ' + y + ' Td (' + safeLine + ') Tj ET\n';
+      y -= 18;
+    });
+    blobContent = '%PDF-1.4\n1 0 obj\n<<\n/Type /Catalog\n/Pages 2 0 R\n>>\nendobj\n2 0 obj\n<<\n/Type /Pages\n/Kids [3 0 R]\n/Count 1\n>>\nendobj\n3 0 obj\n<<\n/Type /Page\n/Parent 2 0 R\n/MediaBox [0 0 612 792]\n/Contents 4 0 R\n/Resources <<\n/Font <<\n/F1 5 0 R\n>>\n>>\n>>\nendobj\n4 0 obj\n<<\n/Length ' + pdfText.length + '\n>>\nstream\n' + pdfText + 'endstream\nendobj\n5 0 obj\n<<\n/Type /Font\n/Subtype /Type1\n/BaseFont /Helvetica\n>>\nendobj\nxref\n0 6\n0000000000 65535 f\n0000000009 00000 n\n0000000058 00000 n\n0000000115 00000 n\n0000000266 00000 n\n0000000400 00000 n\ntrailer\n<<\n/Size 6\n/Root 1 0 R\n>>\nstartxref\n500\n%%EOF';
+  } else if (type === 'doc') {
+    mimeType = 'application/rtf';
+    extension = 'doc';
+    blobContent = '{\\rtf1\\ansi\\deff0 {\\fonttbl {\\f0 Times New Roman;}}\\n' +
+      '\\paperw12240\\paperh15840\\n' +
+      content.split('\n').map(line => '\\pard ' + line + '\\par\\n').join('') +
+      '}';
+  } else {
+    mimeType = 'text/plain;charset=utf-8';
+    extension = 'txt';
+    blobContent = content;
+  }
+  const blob = new Blob([blobContent], { type: mimeType });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = name + '.' + extension;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function renderDetail() {
+  const data = blockData[selectedBlock];
+  const bankInfo = data.banks[selectedBank];
+  const bankLogo = bankLogos[selectedBank];
+  const checklistItems = [
+    "Позвоните в банк по номеру на обратной стороне карты",
+    "Уточните причину блокировки и получите список документов",
+    "Соберите все необходимые документы",
+    "Подайте документы через приложение, email или в отделении",
+    "Получите письменный ответ от банка",
+    "Если отказали без оснований — обратитесь в ЦБ РФ"
+  ];
+  let methodsHtml = '';
+  data.methods.forEach(m => {
+    methodsHtml += '<div class="method-item"><div><div class="method-name">' + m.name + '</div><div class="method-desc">' + m.desc + '</div></div><div class="method-meta"><span class="meta-badge meta-time">⏱️ ' + m.time + '</span><span class="meta-badge meta-docs">📄 ' + m.docs + '</span></div></div>';
+  });
+  let docsHtml = '';
+  data.documents.forEach(d => {
+    docsHtml += '<div class="doc-item"><div class="doc-icon">📋</div><span>' + d + '</span></div>';
+  });
+  let reasonsHtml = '';
+  data.reasons.forEach(r => {
+    reasonsHtml += '<span class="reason-tag">' + r + '</span>';
+  });
+  let checklistHtml = '';
+  checklistItems.forEach(item => {
+    checklistHtml += '<div class="checklist-item" onclick="toggleCheck(this)"><div class="checkbox">✓</div><span class="check-text">' + item + '</span></div>';
+  });
+  let downloadsHtml = '';
+  if (data.downloads && data.downloads.length > 0) {
+    data.downloads.forEach(dl => {
+      const isExternal = dl.type === 'external';
+      const extClass = isExternal ? 'external' : '';
+      const extIcon = isExternal ? '🔗' : '📥';
+      if (isExternal) {
+        downloadsHtml += '<div class="download-card ' + extClass + '" onclick="downloadFile(&quot;' + dl.name + '&quot;, &quot;' + dl.url + '&quot;, &quot;external&quot;)"><div class="dl-icon">' + extIcon + '</div><div class="dl-info"><div class="dl-name">' + dl.name + '</div><div class="dl-desc">' + dl.desc + '</div></div><div class="dl-arrow">→</div></div>';
+      } else {
+        downloadsHtml += '<div class="download-card ' + extClass + '" onclick="downloadFile(&quot;' + dl.name + '&quot;, &quot;' + encodeURIComponent(dl.content) + '&quot;, &quot;' + dl.type + '&quot;)"><div class="dl-icon">' + extIcon + '</div><div class="dl-info"><div class="dl-name">' + dl.name + '</div><div class="dl-desc">' + dl.desc + '</div></div><div class="dl-arrow">→</div></div>';
+      }
+    });
+  }
+  const html = '<div class="detail-panel"><div class="detail-header"><div class="big-icon" style="background: ' + data.gradient + ';">' + data.icon + '</div><div><h2>' + data.title + '</h2><p class="desc">' + data.description + '</p></div></div><div class="panel-section sec-reasons"><h4>Возможные причины</h4><div class="reasons-list">' + reasonsHtml + '</div></div><div class="panel-section sec-methods"><h4>Способы разблокировки</h4>' + methodsHtml + '</div><div class="panel-section sec-docs"><h4>Необходимые документы</h4><div class="docs-grid">' + docsHtml + '</div></div><div class="panel-section sec-bank"><h4>Особенности для ' + selectedBank + '</h4><div class="bank-specific-info"><div class="bank-logo-sm ' + bankLogo.cls + '">' + bankLogo.text + '</div><p>' + bankInfo + '</p></div></div>' + (downloadsHtml ? '<div class="panel-section sec-download"><h4>Материалы для скачивания</h4><div class="download-grid">' + downloadsHtml + '</div></div>' : '') + '<div class="panel-section sec-checklist"><h4>Ваш план действий</h4>' + checklistHtml + '<div class="progress-bar"><div class="progress-fill" id="progressFill" style="width: 0%"></div></div><div class="progress-text" id="progressText">Выполнено: 0 из 6</div></div></div>';
+  document.getElementById('detailPanel').innerHTML = html;
+  document.getElementById('detailPanel').classList.remove('hidden');
+  setTimeout(() => {
+    document.getElementById('detailPanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 100);
+}
+
+function toggleCheck(el) {
+  el.classList.toggle('checked');
+  const checked = document.querySelectorAll('.checklist-item.checked').length;
+  const total = document.querySelectorAll('.checklist-item').length;
+  const pct = (checked / total) * 100;
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressText').textContent = 'Выполнено: ' + checked + ' из ' + total;
+}
+</script>
+
+</body>
+</html>
